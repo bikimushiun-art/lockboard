@@ -2,224 +2,206 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp">
+    android:paddingTop="3dp"
+    android:paddingBottom="3dp">
 
-    <LinearLayout
-        android:id="@+id/d0"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="58dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/l0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-        <TextView
-            android:id="@+id/c0"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="3dp"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-        <TextView
-            android:id="@+id/t0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-    </LinearLayout>
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="12sp"
+        android:textStyle="bold" />
 
-    <LinearLayout
-        android:id="@+id/d1"
+    <FrameLayout
+        android:id="@+id/f0"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:layout_height="34dp"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/b0"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/dot_ring" />
+        <ImageView
+            android:id="@+id/r0"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ring_today"
+            android:visibility="invisible" />
         <TextView
-            android:id="@+id/l1"
+            android:id="@+id/x0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-        <TextView
-            android:id="@+id/c1"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="3dp"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
+            android:layout_gravity="center"
+            android:textSize="12sp"
             android:textStyle="bold" />
-        <TextView
-            android:id="@+id/t1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-    </LinearLayout>
+    </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/d2"
+    <FrameLayout
+        android:id="@+id/f1"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:layout_height="34dp"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/b1"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/dot_ring" />
+        <ImageView
+            android:id="@+id/r1"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ring_today"
+            android:visibility="invisible" />
         <TextView
-            android:id="@+id/l2"
+            android:id="@+id/x1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-        <TextView
-            android:id="@+id/c2"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="3dp"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
+            android:layout_gravity="center"
+            android:textSize="12sp"
             android:textStyle="bold" />
-        <TextView
-            android:id="@+id/t2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-    </LinearLayout>
+    </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/d3"
+    <FrameLayout
+        android:id="@+id/f2"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:layout_height="34dp"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/b2"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/dot_ring" />
+        <ImageView
+            android:id="@+id/r2"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ring_today"
+            android:visibility="invisible" />
         <TextView
-            android:id="@+id/l3"
+            android:id="@+id/x2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-        <TextView
-            android:id="@+id/c3"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="3dp"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
+            android:layout_gravity="center"
+            android:textSize="12sp"
             android:textStyle="bold" />
-        <TextView
-            android:id="@+id/t3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-    </LinearLayout>
+    </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/d4"
+    <FrameLayout
+        android:id="@+id/f3"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:layout_height="34dp"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/b3"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/dot_ring" />
+        <ImageView
+            android:id="@+id/r3"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ring_today"
+            android:visibility="invisible" />
         <TextView
-            android:id="@+id/l4"
+            android:id="@+id/x3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-        <TextView
-            android:id="@+id/c4"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="3dp"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
+            android:layout_gravity="center"
+            android:textSize="12sp"
             android:textStyle="bold" />
-        <TextView
-            android:id="@+id/t4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-    </LinearLayout>
+    </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/d5"
+    <FrameLayout
+        android:id="@+id/f4"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:layout_height="34dp"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/b4"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/dot_ring" />
+        <ImageView
+            android:id="@+id/r4"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ring_today"
+            android:visibility="invisible" />
         <TextView
-            android:id="@+id/l5"
+            android:id="@+id/x4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-        <TextView
-            android:id="@+id/c5"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="3dp"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
+            android:layout_gravity="center"
+            android:textSize="12sp"
             android:textStyle="bold" />
-        <TextView
-            android:id="@+id/t5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-    </LinearLayout>
+    </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/d6"
+    <FrameLayout
+        android:id="@+id/f5"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:layout_height="34dp"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/b5"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/dot_ring" />
+        <ImageView
+            android:id="@+id/r5"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ring_today"
+            android:visibility="invisible" />
         <TextView
-            android:id="@+id/l6"
+            android:id="@+id/x5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-        <TextView
-            android:id="@+id/c6"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="3dp"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
+            android:layout_gravity="center"
+            android:textSize="12sp"
             android:textStyle="bold" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/f6"
+        android:layout_width="0dp"
+        android:layout_height="34dp"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/b6"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/dot_ring" />
+        <ImageView
+            android:id="@+id/r6"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ring_today"
+            android:visibility="invisible" />
         <TextView
-            android:id="@+id/t6"
+            android:id="@+id/x6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="11sp"
-            android:textAppearance="@android:style/TextAppearance.Material.Notification" />
-    </LinearLayout>
+            android:layout_gravity="center"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </FrameLayout>
 </LinearLayout>

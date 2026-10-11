@@ -7,89 +7,110 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.dp
+
+val Bg = Color(0xFFE3DFD8)
+val Ink = Color(0xFF161614)
+val Orange = Color(0xFFFF6A13)
+val CardBg = Color(0xFFF2EFEA)
+val Muted = Color(0xFF6B665E)
 
 class MainActivity : ComponentActivity() {
+    private val resumes = mutableIntStateOf(0)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { MaterialTheme { Screen() } }
+        setContent {
+            MaterialTheme(
+                colorScheme = lightColorScheme(
+                    primary = Ink, onPrimary = Color.White,
+                    secondary = Orange, onSecondary = Color.White,
+                    background = Bg, onBackground = Ink,
+                    surface = CardBg, onSurface = Ink,
+                    surfaceVariant = Color(0xFFD9D4CC), onSurfaceVariant = Muted,
+                    outline = Muted
+                )
+            ) { Root(resumes.intValue) }
+        }
     }
 
     override fun onResume() {
         super.onResume()
+        resumes.intValue++      // перечитать данные: отметки могли быть сделаны из уведомлений
         Notifier.refresh(this)
     }
 }
 
 @Composable
-fun Screen() {
+fun Root(resume: Int) {
     val ctx = LocalContext.current
-    var note by remember { mutableStateOf(Storage.getNote(ctx)) }
-    var tasks by remember { mutableStateOf(Storage.getTasks(ctx)) }
-    var newTask by remember { mutableStateOf("") }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
+    var tick by remember { mutableIntStateOf(0) }
+    val key = resume * 100000 + tick
+    val onChange = { tick++; Notifier.refresh(ctx) }
 
     val permission = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { Notifier.refresh(ctx) }
-
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= 33) permission.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
-    fun sync() {
-        tasks = Storage.getTasks(ctx)
-        Notifier.refresh(ctx)
-    }
-
-    Scaffold { pad ->
-        Column(Modifier.padding(pad).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Заметка", style = MaterialTheme.typography.titleMedium)
-            OutlinedTextField(
-                value = note,
-                onValueChange = { note = it; Storage.setNote(ctx, it); Notifier.refresh(ctx) },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 2
-            )
-
-            Text("Задачи", style = MaterialTheme.typography.titleMedium)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    value = newTask, onValueChange = { newTask = it },
-                    modifier = Modifier.weight(1f), singleLine = true,
-                    placeholder = { Text("Новая задача") }
+    Scaffold(
+        containerColor = Bg,
+        bottomBar = {
+            NavigationBar(containerColor = CardBg) {
+                val items = listOf(
+                    Triple("Трекеры", Icons.Default.DateRange, 0),
+                    Triple("Задачи", Icons.Default.Check, 1),
+                    Triple("Заметка", Icons.Default.Edit, 2)
                 )
-                Spacer(Modifier.width(8.dp))
-                Button(onClick = {
-                    if (newTask.isNotBlank()) {
-                        Storage.addTask(ctx, newTask.trim()); newTask = ""; sync()
-                    }
-                }) { Text("+") }
-            }
-
-            LazyColumn(Modifier.weight(1f)) {
-                items(tasks, key = { it.id }) { t ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(checked = t.done, onCheckedChange = {
-                            Storage.setDone(ctx, t.id, it); sync()
-                        })
-                        Text(
-                            t.text,
-                            textDecoration = if (t.done) TextDecoration.LineThrough else null
+                items.forEach { (label, icon, i) ->
+                    NavigationBarItem(
+                        selected = tab == i,
+                        onClick = { tab = i },
+                        icon = { Icon(icon, contentDescription = label) },
+                        label = { Text(label) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color.White,
+                            selectedTextColor = Ink,
+                            indicatorColor = Ink
                         )
-                    }
+                    )
                 }
             }
-            TextButton(onClick = { Storage.deleteDone(ctx); sync() }) {
-                Text("Удалить выполненные")
+        }
+    ) { pad ->
+        Box(Modifier.fillMaxSize().padding(pad)) {
+            when (tab) {
+                0 -> TrackersScreen(key, onChange)
+                1 -> TasksScreen(key, onChange)
+                else -> NoteScreen(key)
             }
         }
     }

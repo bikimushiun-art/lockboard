@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
+import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -20,16 +21,16 @@ import java.time.temporal.TemporalAdjusters
 
 object Notifier {
     private const val CHANNEL = "lockboard_v3"
-    private const val TRACKER_ID = 2
     private const val NOTE_ID = 1
-    private const val MAX_TASKS = 8
+    private const val SUMMARY_BASE = 50000
+    private const val TRACKER_BASE = 100000
+    private const val MAX_TASKS = 20
     const val KEY_NOTE = "note_text"
-    private val ORANGE = Color.parseColor("#FF6A13")
 
-    private val ROOT = intArrayOf(R.id.d0, R.id.d1, R.id.d2, R.id.d3, R.id.d4, R.id.d5, R.id.d6)
-    private val LET = intArrayOf(R.id.l0, R.id.l1, R.id.l2, R.id.l3, R.id.l4, R.id.l5, R.id.l6)
-    private val CIR = intArrayOf(R.id.c0, R.id.c1, R.id.c2, R.id.c3, R.id.c4, R.id.c5, R.id.c6)
-    private val DAT = intArrayOf(R.id.t0, R.id.t1, R.id.t2, R.id.t3, R.id.t4, R.id.t5, R.id.t6)
+    private val F = intArrayOf(R.id.f0, R.id.f1, R.id.f2, R.id.f3, R.id.f4, R.id.f5, R.id.f6)
+    private val B = intArrayOf(R.id.b0, R.id.b1, R.id.b2, R.id.b3, R.id.b4, R.id.b5, R.id.b6)
+    private val R_ = intArrayOf(R.id.r0, R.id.r1, R.id.r2, R.id.r3, R.id.r4, R.id.r5, R.id.r6)
+    private val X = intArrayOf(R.id.x0, R.id.x1, R.id.x2, R.id.x3, R.id.x4, R.id.x5, R.id.x6)
 
     fun refresh(c: Context) {
         if (Build.VERSION.SDK_INT >= 33 &&
@@ -39,19 +40,24 @@ object Notifier {
 
         createChannel(c)
         val nm = NotificationManagerCompat.from(c)
+        val posted = mutableSetOf<Int>()
 
-        // 1. Трекер недели
-        nm.notify(TRACKER_ID, base(c)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setCustomContentView(trackerViews(c))
-            .setCustomBigContentView(trackerViews(c))
-            .build())
+        // 1. Трекеры: каждый — отдельное уведомление. Свёрнутый и развёрнутый вид одинаковые.
+        Storage.getTrackers(c).forEach { t ->
+            val id = TRACKER_BASE + t.id
+            nm.notify(id, base(c, "1")
+                .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+                .setCustomContentView(trackerViews(c, t))
+                .setCustomBigContentView(trackerViews(c, t))
+                .build())
+            posted += id
+        }
 
-        // 2. Заметка: кнопка «Заметка» с полем ввода, ввод дописывается в конец
+        // 2. Заметка: «Заметка» дописывает строку, «Очистить» стирает
         val note = Storage.getNote(c).ifBlank { "Заметка пуста" }
-        val noteIntent = Intent(c, NoteReceiver::class.java)
         val notePi = PendingIntent.getBroadcast(
-            c, 10, noteIntent, PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            c, 10, Intent(c, NoteReceiver::class.java),
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         val noteAction = NotificationCompat.Action.Builder(0, "Заметка", notePi)
             .addRemoteInput(RemoteInput.Builder(KEY_NOTE).setLabel("Добавить в заметку").build())
@@ -61,63 +67,81 @@ object Notifier {
             c, 11, Intent(c, NoteReceiver::class.java).putExtra("clear", true),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-        nm.notify(NOTE_ID, base(c)
+        nm.notify(NOTE_ID, base(c, "2")
             .setContentText(note)
             .setStyle(NotificationCompat.BigTextStyle().bigText(note))
             .addAction(noteAction)
             .addAction(0, "Очистить", clearPi)
             .build())
+        posted += NOTE_ID
 
-        // 3. Задачи
-        val tasks = Storage.getTasks(c)
-        tasks.filter { it.done }.forEach { nm.cancel(it.id) }
-        tasks.filter { !it.done }.take(MAX_TASKS).forEach { t ->
-            val pi = PendingIntent.getBroadcast(
-                c, t.id, Intent(c, DoneReceiver::class.java).putExtra("id", t.id),
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-            nm.notify(t.id, base(c)
-                .setContentText(t.text)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(t.text))
-                .setGroup("tasks")
-                .addAction(0, "Готово", pi)
+        // 3. Задачи по группам: у каждой задачи название группы в шапке, плюс общая сводка группы
+        val groups = Storage.getGroups(c)
+        var shown = 0
+        val active = Storage.getTasks(c).filter { !it.done }
+        for (g in groups) {
+            val items = active.filter { it.groupId == g.id }.take(MAX_TASKS - shown)
+            if (items.isEmpty()) continue
+            shown += items.size
+            val key = "task_g${g.id}"
+            items.forEach { t ->
+                val pi = PendingIntent.getBroadcast(
+                    c, t.id, Intent(c, DoneReceiver::class.java).putExtra("id", t.id),
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                )
+                nm.notify(t.id, base(c, "3")
+                    .setSubText(g.name)
+                    .setContentText(t.text)
+                    .setStyle(NotificationCompat.BigTextStyle().bigText(t.text))
+                    .setGroup(key)
+                    .addAction(0, "Готово", pi)
+                    .build())
+                posted += t.id
+            }
+            val inbox = NotificationCompat.InboxStyle()
+            items.forEach { inbox.addLine(it.text) }
+            nm.notify(SUMMARY_BASE + g.id, base(c, "3")
+                .setContentTitle(g.name)
+                .setContentText("Задач: ${items.size}")
+                .setStyle(inbox)
+                .setGroup(key)
+                .setGroupSummary(true)
                 .build())
+            posted += SUMMARY_BASE + g.id
         }
+
+        // убрать уведомления того, чего больше нет
+        (Storage.getPosted(c) - posted).forEach { nm.cancel(it) }
+        Storage.setPosted(c, posted)
     }
 
-    private fun trackerViews(c: Context): RemoteViews {
+    private fun trackerViews(c: Context, t: Tracker): RemoteViews {
         val rv = RemoteViews(c.packageName, R.layout.notif_tracker)
         val today = LocalDate.now()
         val monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-        val checked = Storage.getChecked(c)
+        val checked = Storage.getChecks(c, t.id)
         val letters = "ПВСЧПСВ"
+        rv.setTextViewText(R.id.name, t.name)
+        rv.setTextColor(R.id.name, t.color)
         for (i in 0..6) {
             val d = monday.plusDays(i.toLong())
-            val isToday = d == today
             val on = d.toString() in checked
-            rv.setTextViewText(LET[i], letters[i].toString())
-            rv.setTextViewText(DAT[i], d.dayOfMonth.toString())
-            rv.setTextViewText(CIR[i], if (on) "✓" else "")
-            rv.setInt(CIR[i], "setBackgroundResource",
-                when {
-                    isToday -> R.drawable.circle_today
-                    on -> R.drawable.circle_on
-                    else -> R.drawable.circle_off
-                })
-            if (isToday) {
-                rv.setTextColor(LET[i], ORANGE)
-                rv.setTextColor(DAT[i], ORANGE)
-            }
+            rv.setImageViewResource(B[i], if (on) R.drawable.dot_fill else R.drawable.dot_ring)
+            rv.setInt(B[i], "setColorFilter", t.color)
+            rv.setViewVisibility(R_[i], if (d == today) View.VISIBLE else View.INVISIBLE)
+            rv.setTextViewText(X[i], if (on) "✓" else letters[i].toString())
+            rv.setTextColor(X[i], if (on) Color.WHITE else t.color)
             val pi = PendingIntent.getBroadcast(
-                c, 1000 + i, Intent(c, DayReceiver::class.java).putExtra("date", d.toString()),
+                c, t.id * 10 + i,
+                Intent(c, DayReceiver::class.java).putExtra("tracker", t.id).putExtra("date", d.toString()),
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
-            rv.setOnClickPendingIntent(ROOT[i], pi)
+            rv.setOnClickPendingIntent(F[i], pi)
         }
         return rv
     }
 
-    private fun base(c: Context): NotificationCompat.Builder {
+    private fun base(c: Context, sort: String): NotificationCompat.Builder {
         val open = PendingIntent.getActivity(
             c, 0, Intent(c, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE
         )
@@ -127,6 +151,7 @@ object Notifier {
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setShowWhen(false)
+            .setSortKey(sort)
             .setContentIntent(open)
     }
 
