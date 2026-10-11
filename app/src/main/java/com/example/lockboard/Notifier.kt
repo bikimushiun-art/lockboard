@@ -8,7 +8,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
+import android.text.SpannableString
+import android.text.style.StrikethroughSpan
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
@@ -24,12 +27,17 @@ object Notifier {
     private const val NOTE_ID = 1
     private const val TRACKERS_ID = 2
     private const val TASKS_ID = 3
-    private const val MAX_TASKS = 12
+    private const val LAUNCH_ID = 4
+    private const val MAX_TASK_ROWS = 14
+    private const val COLLAPSED_ROWS = 2
     const val KEY_NOTE = "note_text"
+
+    private const val CHATGPT_PKG = "com.openai.chatgpt"
+    private const val NOTES_PKG = "com.miui.notes"
+    private val GREY = Color.parseColor("#8C8678")
 
     private val F = intArrayOf(R.id.f0, R.id.f1, R.id.f2, R.id.f3, R.id.f4, R.id.f5, R.id.f6)
     private val B = intArrayOf(R.id.b0, R.id.b1, R.id.b2, R.id.b3, R.id.b4, R.id.b5, R.id.b6)
-    private val R_ = intArrayOf(R.id.r0, R.id.r1, R.id.r2, R.id.r3, R.id.r4, R.id.r5, R.id.r6)
     private val X = intArrayOf(R.id.x0, R.id.x1, R.id.x2, R.id.x3, R.id.x4, R.id.x5, R.id.x6)
 
     fun refresh(c: Context) {
@@ -42,18 +50,18 @@ object Notifier {
         val nm = NotificationManagerCompat.from(c)
         val posted = mutableSetOf<Int>()
 
-        // 1. Все трекеры в одном уведомлении. Свёрнутый и развёрнутый вид одинаковые.
+        // 1. Трекеры (в свёрнутом виде — первые два, чтобы ничего не обрезалось; в развёрнутом — все)
         val trackers = Storage.getTrackers(c)
         if (trackers.isNotEmpty()) {
             nm.notify(TRACKERS_ID, base(c, "1")
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                .setCustomContentView(trackersViews(c, trackers))
+                .setCustomContentView(trackersViews(c, trackers.take(COLLAPSED_ROWS)))
                 .setCustomBigContentView(trackersViews(c, trackers))
                 .build())
             posted += TRACKERS_ID
         }
 
-        // 2. Заметка: «Заметка» дописывает строку, «Очистить» стирает
+        // 2. Заметка
         val note = Storage.getNote(c).ifBlank { "Заметка пуста" }
         val notePi = PendingIntent.getBroadcast(
             c, 10, Intent(c, NoteReceiver::class.java),
@@ -75,22 +83,31 @@ object Notifier {
             .build())
         posted += NOTE_ID
 
-        // 3. Все задачи всех групп в одном блоке; кружок слева отмечает задачу выполненной
+        // 3. Задачи: выполненные остаются в списке (серые, зачёркнутые), нажатие переключает
         val groups = Storage.getGroups(c)
-        val active = Storage.getTasks(c).filter { !it.done }
-        if (active.isNotEmpty()) {
+        val tasks = Storage.getTasks(c)
+        if (tasks.isNotEmpty()) {
             nm.notify(TASKS_ID, base(c, "3")
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-                .setCustomContentView(tasksViews(c, groups, active))
-                .setCustomBigContentView(tasksViews(c, groups, active))
+                .setCustomContentView(tasksViews(c, groups, tasks, COLLAPSED_ROWS, false))
+                .setCustomBigContentView(tasksViews(c, groups, tasks, MAX_TASK_ROWS, true))
                 .build())
             posted += TASKS_ID
         }
 
-        // убрать уведомления, которых больше нет (старые отдельные карточки задач тоже)
+        // 4. Быстрый запуск: ChatGPT (или страница в браузере) и системные Заметки
+        nm.notify(LAUNCH_ID, base(c, "4")
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setCustomContentView(launchViews(c))
+            .setCustomBigContentView(launchViews(c))
+            .build())
+        posted += LAUNCH_ID
+
         (Storage.getPosted(c) - posted).forEach { nm.cancel(it) }
         Storage.setPosted(c, posted)
     }
+
+    // ---------------- трекеры ----------------
 
     private fun trackersViews(c: Context, trackers: List<Tracker>): RemoteViews {
         val rv = RemoteViews(c.packageName, R.layout.notif_trackers)
@@ -109,11 +126,23 @@ object Notifier {
         for (i in 0..6) {
             val d = monday.plusDays(i.toLong())
             val on = d.toString() in checked
-            rv.setImageViewResource(B[i], if (on) R.drawable.dot_fill else R.drawable.dot_ring)
-            rv.setInt(B[i], "setColorFilter", t.color)
-            rv.setViewVisibility(R_[i], if (d == today) View.VISIBLE else View.INVISIBLE)
+            val isToday = d == today
+            // пусто: пунктир; отмечено: заливка без обводки;
+            // сегодня: белое сплошное кольцо, а если отмечено — белая заливка
+            val shape = when {
+                on -> R.drawable.dot_fill
+                isToday -> R.drawable.dot_ring_solid
+                else -> R.drawable.dot_ring
+            }
+            rv.setImageViewResource(B[i], shape)
+            rv.setInt(B[i], "setColorFilter", if (isToday) Color.WHITE else t.color)
             rv.setTextViewText(X[i], if (on) "✓" else letters[i].toString())
-            rv.setTextColor(X[i], if (on) Color.WHITE else t.color)
+            rv.setTextColor(X[i], when {
+                isToday && on -> t.color
+                on -> Color.WHITE
+                isToday -> Color.WHITE
+                else -> t.color
+            })
             val pi = PendingIntent.getBroadcast(
                 c, t.id * 10 + i,
                 Intent(c, DayReceiver::class.java).putExtra("tracker", t.id).putExtra("date", d.toString()),
@@ -124,19 +153,34 @@ object Notifier {
         return rv
     }
 
-    private fun tasksViews(c: Context, groups: List<Group>, active: List<Task>): RemoteViews {
+    // ---------------- задачи ----------------
+
+    private fun tasksViews(
+        c: Context, groups: List<Group>, tasks: List<Task>, maxRows: Int, showMore: Boolean
+    ): RemoteViews {
         val rv = RemoteViews(c.packageName, R.layout.notif_tasks)
         var shown = 0
         for (g in groups) {
-            val items = active.filter { it.groupId == g.id }
-            if (items.isEmpty() || shown >= MAX_TASKS) continue
+            if (shown >= maxRows) break
+            val items = tasks.filter { it.groupId == g.id }.sortedBy { it.done } // невыполненные сверху
+            if (items.isEmpty()) continue
             val header = RemoteViews(c.packageName, R.layout.notif_task_header)
-            header.setTextViewText(R.id.gname, g.name)
+            header.setTextViewText(R.id.gname, "${g.name}   ${items.count { it.done }}/${items.size}")
             rv.addView(R.id.tcontainer, header)
             for (t in items) {
-                if (shown >= MAX_TASKS) break
+                if (shown >= maxRows) break
                 val row = RemoteViews(c.packageName, R.layout.notif_task_row)
-                row.setTextViewText(R.id.ttext, t.text)
+                if (t.done) {
+                    val s = SpannableString(t.text)
+                    s.setSpan(StrikethroughSpan(), 0, s.length, 0)
+                    row.setTextViewText(R.id.ttext, s)
+                    row.setTextColor(R.id.ttext, GREY)
+                    row.setTextViewText(R.id.tbox, "✓")
+                    row.setTextColor(R.id.tbox, GREY)
+                } else {
+                    row.setTextViewText(R.id.ttext, t.text)
+                    row.setTextViewText(R.id.tbox, "○")
+                }
                 val pi = PendingIntent.getBroadcast(
                     c, t.id, Intent(c, DoneReceiver::class.java).putExtra("id", t.id),
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
@@ -146,14 +190,38 @@ object Notifier {
                 shown++
             }
         }
-        val hidden = active.size - shown
-        if (hidden > 0) {
+        val hidden = tasks.size - shown
+        if (showMore && hidden > 0) {
             val more = RemoteViews(c.packageName, R.layout.notif_task_header)
             more.setTextViewText(R.id.gname, "+ ещё $hidden в приложении")
             rv.addView(R.id.tcontainer, more)
         }
         return rv
     }
+
+    // ---------------- быстрый запуск ----------------
+
+    private fun launchViews(c: Context): RemoteViews {
+        val rv = RemoteViews(c.packageName, R.layout.notif_launch)
+        // ChatGPT: приложение, если установлено, иначе сайт
+        val chat = c.packageManager.getLaunchIntentForPackage(CHATGPT_PKG)
+            ?: Intent(Intent.ACTION_VIEW, Uri.parse("https://chatgpt.com"))
+        rv.setOnClickPendingIntent(R.id.l1, activityPi(c, chat, 20))
+        // Системные Заметки (Xiaomi): только если приложение найдено
+        val notes = c.packageManager.getLaunchIntentForPackage(NOTES_PKG)
+        if (notes != null) rv.setOnClickPendingIntent(R.id.l2, activityPi(c, notes, 21))
+        else rv.setViewVisibility(R.id.l2, View.GONE)
+        return rv
+    }
+
+    private fun activityPi(c: Context, intent: Intent, code: Int): PendingIntent {
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        return PendingIntent.getActivity(
+            c, code, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    }
+
+    // ---------------- общее ----------------
 
     private fun base(c: Context, sort: String): NotificationCompat.Builder {
         val open = PendingIntent.getActivity(

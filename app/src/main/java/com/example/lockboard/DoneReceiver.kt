@@ -4,10 +4,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 
+/** Нажатие на кружок задачи: выполнено / не выполнено. */
 class DoneReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val id = intent.getIntExtra("id", -1)
-        if (id != -1) Storage.setDone(context, id, true)
+        if (id != -1) Storage.toggleDone(context, id)
         Notifier.refresh(context)
     }
 }

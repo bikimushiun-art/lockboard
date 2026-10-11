@@ -1,8 +1,10 @@
 package com.example.lockboard
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -45,6 +47,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) handleShare(intent)
         setContent {
             MaterialTheme(
                 colorScheme = lightColorScheme(
@@ -56,6 +59,21 @@ class MainActivity : ComponentActivity() {
                     outline = Muted
                 )
             ) { Root(resumes.intValue) }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleShare(intent)
+    }
+
+    private fun handleShare(i: Intent?) {
+        if (i?.action != Intent.ACTION_SEND) return
+        val text = i.getStringExtra(Intent.EXTRA_TEXT)?.trim()
+        if (!text.isNullOrEmpty()) {
+            Storage.appendNote(this, text)
+            Toast.makeText(this, "Добавлено в заметку", Toast.LENGTH_SHORT).show()
         }
     }
 

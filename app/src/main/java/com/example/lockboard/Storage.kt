@@ -131,6 +131,9 @@ object Storage {
     fun setDone(c: Context, id: Int, done: Boolean) =
         saveTasks(c, getTasks(c).map { if (it.id == id) it.copy(done = done) else it })
 
+    fun toggleDone(c: Context, id: Int) =
+        saveTasks(c, getTasks(c).map { if (it.id == id) it.copy(done = !it.done) else it })
+
     fun deleteTask(c: Context, id: Int) = saveTasks(c, getTasks(c).filter { it.id != id })
 
     fun deleteDone(c: Context) = saveTasks(c, getTasks(c).filter { !it.done })

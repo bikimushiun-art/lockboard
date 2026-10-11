@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/name"
-        android:layout_width="56dp"
+        android:layout_width="68dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
@@ -18,21 +18,14 @@
 
     <FrameLayout
         android:id="@+id/f0"
-        android:layout_width="27dp"
+        android:layout_width="25dp"
         android:layout_height="28dp">
         <ImageView
             android:id="@+id/b0"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
-        <ImageView
-            android:id="@+id/r0"
-            android:layout_width="27dp"
-            android:layout_height="27dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ring_today"
-            android:visibility="invisible" />
         <TextView
             android:id="@+id/x0"
             android:layout_width="wrap_content"
@@ -44,21 +37,14 @@
 
     <FrameLayout
         android:id="@+id/f1"
-        android:layout_width="27dp"
+        android:layout_width="25dp"
         android:layout_height="28dp">
         <ImageView
             android:id="@+id/b1"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
-        <ImageView
-            android:id="@+id/r1"
-            android:layout_width="27dp"
-            android:layout_height="27dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ring_today"
-            android:visibility="invisible" />
         <TextView
             android:id="@+id/x1"
             android:layout_width="wrap_content"
@@ -70,21 +56,14 @@
 
     <FrameLayout
         android:id="@+id/f2"
-        android:layout_width="27dp"
+        android:layout_width="25dp"
         android:layout_height="28dp">
         <ImageView
             android:id="@+id/b2"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
-        <ImageView
-            android:id="@+id/r2"
-            android:layout_width="27dp"
-            android:layout_height="27dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ring_today"
-            android:visibility="invisible" />
         <TextView
             android:id="@+id/x2"
             android:layout_width="wrap_content"
@@ -96,21 +75,14 @@
 
     <FrameLayout
         android:id="@+id/f3"
-        android:layout_width="27dp"
+        android:layout_width="25dp"
         android:layout_height="28dp">
         <ImageView
             android:id="@+id/b3"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
-        <ImageView
-            android:id="@+id/r3"
-            android:layout_width="27dp"
-            android:layout_height="27dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ring_today"
-            android:visibility="invisible" />
         <TextView
             android:id="@+id/x3"
             android:layout_width="wrap_content"
@@ -122,21 +94,14 @@
 
     <FrameLayout
         android:id="@+id/f4"
-        android:layout_width="27dp"
+        android:layout_width="25dp"
         android:layout_height="28dp">
         <ImageView
             android:id="@+id/b4"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
-        <ImageView
-            android:id="@+id/r4"
-            android:layout_width="27dp"
-            android:layout_height="27dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ring_today"
-            android:visibility="invisible" />
         <TextView
             android:id="@+id/x4"
             android:layout_width="wrap_content"
@@ -148,21 +113,14 @@
 
     <FrameLayout
         android:id="@+id/f5"
-        android:layout_width="27dp"
+        android:layout_width="25dp"
         android:layout_height="28dp">
         <ImageView
             android:id="@+id/b5"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
-        <ImageView
-            android:id="@+id/r5"
-            android:layout_width="27dp"
-            android:layout_height="27dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ring_today"
-            android:visibility="invisible" />
         <TextView
             android:id="@+id/x5"
             android:layout_width="wrap_content"
@@ -174,21 +132,14 @@
 
     <FrameLayout
         android:id="@+id/f6"
-        android:layout_width="27dp"
+        android:layout_width="25dp"
         android:layout_height="28dp">
         <ImageView
             android:id="@+id/b6"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="23dp"
+            android:layout_height="23dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
-        <ImageView
-            android:id="@+id/r6"
-            android:layout_width="27dp"
-            android:layout_height="27dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ring_today"
-            android:visibility="invisible" />
         <TextView
             android:id="@+id/x6"
             android:layout_width="wrap_content"
