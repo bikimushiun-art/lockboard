@@ -9,6 +9,6 @@ class DayReceiver : BroadcastReceiver() {
         val tracker = intent.getIntExtra("tracker", -1)
         val date = intent.getStringExtra("date")
         if (tracker != -1 && date != null) Storage.toggleDay(context, tracker, date)
-        Notifier.refresh(context)
+        Notifier.refresh(context, setOf(Notifier.Part.TRACKERS)) // обновляем только блок трекеров
     }
 }

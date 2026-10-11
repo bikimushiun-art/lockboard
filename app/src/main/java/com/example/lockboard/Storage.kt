@@ -9,6 +9,12 @@ data class Group(val id: Int, val name: String)
 data class Task(val id: Int, val groupId: Int, val text: String, val done: Boolean)
 
 object Storage {
+    // Кэши в памяти: JSON разбирается один раз, а не при каждом нажатии в уведомлении
+    @Volatile private var tCache: List<Tracker>? = null
+    @Volatile private var gCache: List<Group>? = null
+    @Volatile private var kCache: List<Task>? = null
+    @Volatile private var cCache: Map<Int, Set<String>>? = null
+
     private fun p(c: Context) = c.getSharedPreferences("lockboard", Context.MODE_PRIVATE)
 
     private fun nextId(c: Context): Int {
@@ -27,6 +33,7 @@ object Storage {
 
     // ---------- трекеры ----------
     fun getTrackers(c: Context): List<Tracker> {
+        tCache?.let { return it }
         if (!p(c).contains("trackers")) {
             // первый запуск (или обновление со старой версии): один трекер, старые отметки переносим
             val t = Tracker(nextId(c), "Привычка", 0xFFFF6A13.toInt())
@@ -35,19 +42,23 @@ object Storage {
             if (old.isNotEmpty()) {
                 val o = JSONObject().put(t.id.toString(), JSONArray(old.toList()))
                 p(c).edit().putString("checks", o.toString()).apply()
+                cCache = null
             }
         }
         val arr = JSONArray(p(c).getString("trackers", "[]"))
-        return (0 until arr.length()).map {
+        val list = (0 until arr.length()).map {
             val o = arr.getJSONObject(it)
             Tracker(o.getInt("id"), o.getString("name"), o.getInt("color"))
         }
+        tCache = list
+        return list
     }
 
     private fun saveTrackers(c: Context, list: List<Tracker>) {
         val arr = JSONArray()
         list.forEach { arr.put(JSONObject().put("id", it.id).put("name", it.name).put("color", it.color)) }
         p(c).edit().putString("trackers", arr.toString()).apply()
+        tCache = list
     }
 
     fun addTracker(c: Context, name: String, color: Int) =
@@ -58,40 +69,58 @@ object Storage {
 
     fun deleteTracker(c: Context, id: Int) {
         saveTrackers(c, getTrackers(c).filter { it.id != id })
-        val o = loadChecks(c)
-        o.remove(id.toString())
+        val m = allChecks(c).toMutableMap()
+        m.remove(id)
+        saveChecks(c, m)
+    }
+
+    private fun allChecks(c: Context): Map<Int, Set<String>> {
+        cCache?.let { return it }
+        val o = JSONObject(p(c).getString("checks", "{}") ?: "{}")
+        val m = HashMap<Int, Set<String>>()
+        o.keys().forEach { k ->
+            val a = o.getJSONArray(k)
+            m[k.toInt()] = (0 until a.length()).map { a.getString(it) }.toSet()
+        }
+        cCache = m
+        return m
+    }
+
+    private fun saveChecks(c: Context, m: Map<Int, Set<String>>) {
+        val o = JSONObject()
+        m.forEach { (k, v) -> o.put(k.toString(), JSONArray(v.toList())) }
         p(c).edit().putString("checks", o.toString()).apply()
+        cCache = m
     }
 
-    private fun loadChecks(c: Context) = JSONObject(p(c).getString("checks", "{}") ?: "{}")
-
-    fun getChecks(c: Context, trackerId: Int): Set<String> {
-        val a = loadChecks(c).optJSONArray(trackerId.toString()) ?: return emptySet()
-        return (0 until a.length()).map { a.getString(it) }.toSet()
-    }
+    fun getChecks(c: Context, trackerId: Int): Set<String> = allChecks(c)[trackerId] ?: emptySet()
 
     fun toggleDay(c: Context, trackerId: Int, date: String) {
-        val set = getChecks(c, trackerId).toMutableSet()
+        val m = allChecks(c).toMutableMap()
+        val set = (m[trackerId] ?: emptySet()).toMutableSet()
         if (!set.add(date)) set.remove(date)
-        val o = loadChecks(c)
-        o.put(trackerId.toString(), JSONArray(set.toList()))
-        p(c).edit().putString("checks", o.toString()).apply()
+        m[trackerId] = set
+        saveChecks(c, m)
     }
 
     // ---------- группы и задачи ----------
     fun getGroups(c: Context): List<Group> {
+        gCache?.let { return it }
         if (!p(c).contains("groups")) saveGroups(c, listOf(Group(nextId(c), "Задачи")))
         val arr = JSONArray(p(c).getString("groups", "[]"))
-        return (0 until arr.length()).map {
+        val list = (0 until arr.length()).map {
             val o = arr.getJSONObject(it)
             Group(o.getInt("id"), o.getString("name"))
         }
+        gCache = list
+        return list
     }
 
     private fun saveGroups(c: Context, list: List<Group>) {
         val arr = JSONArray()
         list.forEach { arr.put(JSONObject().put("id", it.id).put("name", it.name)) }
         p(c).edit().putString("groups", arr.toString()).apply()
+        gCache = list
     }
 
     fun addGroup(c: Context, name: String) = saveGroups(c, getGroups(c) + Group(nextId(c), name))
@@ -106,12 +135,15 @@ object Storage {
     }
 
     fun getTasks(c: Context): List<Task> {
+        kCache?.let { return it }
         val fallback = getGroups(c).firstOrNull()?.id ?: -1 // старые задачи без группы
         val arr = JSONArray(p(c).getString("tasks", "[]"))
-        return (0 until arr.length()).map {
+        val list = (0 until arr.length()).map {
             val o = arr.getJSONObject(it)
             Task(o.getInt("id"), o.optInt("group", fallback), o.getString("text"), o.getBoolean("done"))
         }
+        kCache = list
+        return list
     }
 
     private fun saveTasks(c: Context, tasks: List<Task>) {
@@ -120,6 +152,7 @@ object Storage {
             arr.put(JSONObject().put("id", it.id).put("group", it.groupId).put("text", it.text).put("done", it.done))
         }
         p(c).edit().putString("tasks", arr.toString()).apply()
+        kCache = tasks
     }
 
     fun addTask(c: Context, groupId: Int, text: String) =
@@ -142,6 +175,8 @@ object Storage {
     fun getPosted(c: Context): Set<Int> =
         (p(c).getStringSet("posted", emptySet()) ?: emptySet()).mapNotNull { it.toIntOrNull() }.toSet()
 
-    fun setPosted(c: Context, ids: Set<Int>) =
+    fun setPosted(c: Context, ids: Set<Int>) {
+        if (ids == getPosted(c)) return
         p(c).edit().putStringSet("posted", ids.map { it.toString() }.toSet()).apply()
+    }
 }

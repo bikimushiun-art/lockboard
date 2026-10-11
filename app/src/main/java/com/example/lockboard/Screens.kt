@@ -558,7 +558,7 @@ fun NoteScreen(key: Any) {
         delay(600)
         if (text != Storage.getNote(ctx)) {
             Storage.setNote(ctx, text)
-            Notifier.refresh(ctx)
+            Notifier.refresh(ctx, setOf(Notifier.Part.NOTE))
         }
     }
 

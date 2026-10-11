@@ -14,6 +14,6 @@ class NoteReceiver : BroadcastReceiver() {
                 ?.getCharSequence(Notifier.KEY_NOTE)?.toString()?.trim()
             if (!text.isNullOrEmpty()) Storage.appendNote(context, text)
         }
-        Notifier.refresh(context) // обновление гасит индикатор «отправка» у поля ввода
+        Notifier.refresh(context, setOf(Notifier.Part.NOTE)) // только заметка; заодно гасит индикатор отправки
     }
 }
