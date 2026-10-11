@@ -13,7 +13,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 
 object Notifier {
-    private const val CHANNEL = "lockboard"
+    private const val CHANNEL = "lockboard_v2"
+    private const val OLD_CHANNEL = "lockboard"
     private const val NOTE_ID = 1
     private const val MAX_TASKS = 8
 
@@ -65,15 +66,18 @@ object Notifier {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC) // показывать на локскрине
             .setOngoing(true)
             .setOnlyAlertOnce(true)
-            .setSilent(true)
             .setContentIntent(open)
     }
 
     private fun createChannel(c: Context) {
-        val ch = NotificationChannel(CHANNEL, "Локскрин", NotificationManager.IMPORTANCE_LOW).apply {
+        val nm = c.getSystemService(NotificationManager::class.java)
+        nm.deleteNotificationChannel(OLD_CHANNEL)
+        val ch = NotificationChannel(CHANNEL, "Локскрин", NotificationManager.IMPORTANCE_DEFAULT).apply {
             lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+            setSound(null, null)
+            enableVibration(false)
             setShowBadge(false)
         }
-        c.getSystemService(NotificationManager::class.java).createNotificationChannel(ch)
+        nm.createNotificationChannel(ch)
     }
 }
