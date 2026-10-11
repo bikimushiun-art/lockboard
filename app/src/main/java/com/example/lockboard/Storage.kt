@@ -10,9 +10,25 @@ object Storage {
     private const val PREFS = "lockboard"
     private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
+    // ---- заметка ----
     fun getNote(c: Context): String = prefs(c).getString("note", "") ?: ""
     fun setNote(c: Context, text: String) = prefs(c).edit().putString("note", text).apply()
+    fun appendNote(c: Context, line: String) {
+        val cur = getNote(c)
+        setNote(c, if (cur.isBlank()) line else cur + "\n" + line)
+    }
 
+    // ---- трекер недели: отмеченные даты (ISO, например 2026-10-11) ----
+    fun getChecked(c: Context): Set<String> =
+        (prefs(c).getStringSet("days", emptySet()) ?: emptySet()).toSet()
+
+    fun toggleDay(c: Context, date: String) {
+        val s = getChecked(c).toMutableSet()
+        if (!s.add(date)) s.remove(date)
+        prefs(c).edit().putStringSet("days", s).apply()
+    }
+
+    // ---- задачи ----
     fun getTasks(c: Context): List<Task> {
         val arr = JSONArray(prefs(c).getString("tasks", "[]"))
         return (0 until arr.length()).map {

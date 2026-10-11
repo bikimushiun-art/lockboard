@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -18,8 +19,17 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".DoneReceiver"
-            android:exported="false" />
+        <receiver android:name=".DoneReceiver" android:exported="false" />
+        <receiver android:name=".NoteReceiver" android:exported="false" />
+        <receiver android:name=".DayReceiver" android:exported="false" />
+
+        <receiver android:name=".SystemReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
