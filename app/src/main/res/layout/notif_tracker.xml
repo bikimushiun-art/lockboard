@@ -4,12 +4,12 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingTop="3dp"
-    android:paddingBottom="3dp">
+    android:paddingTop="2dp"
+    android:paddingBottom="2dp">
 
     <TextView
         android:id="@+id/name"
-        android:layout_width="58dp"
+        android:layout_width="56dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
@@ -18,19 +18,18 @@
 
     <FrameLayout
         android:id="@+id/f0"
-        android:layout_width="0dp"
-        android:layout_height="34dp"
-        android:layout_weight="1">
+        android:layout_width="27dp"
+        android:layout_height="28dp">
         <ImageView
             android:id="@+id/b0"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
         <ImageView
             android:id="@+id/r0"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
             android:layout_gravity="center"
             android:src="@drawable/ring_today"
             android:visibility="invisible" />
@@ -39,25 +38,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/f1"
-        android:layout_width="0dp"
-        android:layout_height="34dp"
-        android:layout_weight="1">
+        android:layout_width="27dp"
+        android:layout_height="28dp">
         <ImageView
             android:id="@+id/b1"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
         <ImageView
             android:id="@+id/r1"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
             android:layout_gravity="center"
             android:src="@drawable/ring_today"
             android:visibility="invisible" />
@@ -66,25 +64,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/f2"
-        android:layout_width="0dp"
-        android:layout_height="34dp"
-        android:layout_weight="1">
+        android:layout_width="27dp"
+        android:layout_height="28dp">
         <ImageView
             android:id="@+id/b2"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
         <ImageView
             android:id="@+id/r2"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
             android:layout_gravity="center"
             android:src="@drawable/ring_today"
             android:visibility="invisible" />
@@ -93,25 +90,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/f3"
-        android:layout_width="0dp"
-        android:layout_height="34dp"
-        android:layout_weight="1">
+        android:layout_width="27dp"
+        android:layout_height="28dp">
         <ImageView
             android:id="@+id/b3"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
         <ImageView
             android:id="@+id/r3"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
             android:layout_gravity="center"
             android:src="@drawable/ring_today"
             android:visibility="invisible" />
@@ -120,25 +116,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/f4"
-        android:layout_width="0dp"
-        android:layout_height="34dp"
-        android:layout_weight="1">
+        android:layout_width="27dp"
+        android:layout_height="28dp">
         <ImageView
             android:id="@+id/b4"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
         <ImageView
             android:id="@+id/r4"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
             android:layout_gravity="center"
             android:src="@drawable/ring_today"
             android:visibility="invisible" />
@@ -147,25 +142,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/f5"
-        android:layout_width="0dp"
-        android:layout_height="34dp"
-        android:layout_weight="1">
+        android:layout_width="27dp"
+        android:layout_height="28dp">
         <ImageView
             android:id="@+id/b5"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
         <ImageView
             android:id="@+id/r5"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
             android:layout_gravity="center"
             android:src="@drawable/ring_today"
             android:visibility="invisible" />
@@ -174,25 +168,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/f6"
-        android:layout_width="0dp"
-        android:layout_height="34dp"
-        android:layout_weight="1">
+        android:layout_width="27dp"
+        android:layout_height="28dp">
         <ImageView
             android:id="@+id/b6"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_gravity="center"
             android:src="@drawable/dot_ring" />
         <ImageView
             android:id="@+id/r6"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
             android:layout_gravity="center"
             android:src="@drawable/ring_today"
             android:visibility="invisible" />
@@ -201,7 +194,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </FrameLayout>
 </LinearLayout>
